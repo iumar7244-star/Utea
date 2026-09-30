@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تسجيل الدخول / إنشاء حساب — جسر الوصول</title>
+<link rel="icon" href="logo.jpg" type="image/jpeg">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Tajawal',Arial,sans-serif;background:#f4f7f6;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+  .card{background:#fff;border-radius:20px;box-shadow:0 20px 50px rgba(8,43,76,.12);padding:32px;width:100%;max-width:400px}
+  .logo{width:64px;height:64px;border-radius:50%;display:block;margin:0 auto 14px;object-fit:cover}
+  h1{text-align:center;font-size:19px;color:#082b4c;margin:0 0 4px}
+  .subtitle{text-align:center;color:#647486;font-size:13px;margin-bottom:22px}
+  .tabs{display:flex;background:#eef2f4;border-radius:12px;padding:4px;margin-bottom:20px}
+  .tabs button{flex:1;border:0;background:transparent;padding:10px;border-radius:9px;font-family:inherit;font-weight:800;font-size:13px;color:#647486;cursor:pointer}
+  .tabs button.active{background:#fff;color:#082b4c;box-shadow:0 3px 8px rgba(8,43,76,.08)}
+  form{display:none}
+  form.active{display:block}
+  label{display:block;font-size:12px;font-weight:800;color:#55636d;margin:12px 0 5px}
+  input{width:100%;padding:11px 13px;border:1px solid #d7dee2;border-radius:9px;font-size:14px;font-family:inherit}
+  input:focus{outline:none;border-color:#082b4c}
+  button.submit{width:100%;margin-top:18px;background:#082b4c;color:#fff;border:0;border-radius:10px;padding:12px;font-weight:900;font-size:14px;font-family:inherit;cursor:pointer}
+  button.submit:hover{background:#0c3d66}
+  .divider{display:flex;align-items:center;gap:10px;margin:18px 0;color:#9aa9b5;font-size:11px}
+  .divider::before,.divider::after{content:'';flex:1;border-top:1px solid #e3e9ee}
+  .google-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;border:1px solid #d7dee2;border-radius:10px;padding:11px;font-family:inherit;font-weight:800;font-size:13.5px;color:#33414c;cursor:pointer}
+  .google-btn:hover{background:#f8f9fa}
+  .msg{margin-top:14px;padding:10px 12px;border-radius:9px;font-size:13px;display:none;line-height:1.7}
+  .msg.error{background:#fdeceb;color:#a1302a;display:block}
+  .msg.success{background:#e9f7f1;color:#0d6b46;display:block}
+  .back{display:block;text-align:center;margin-top:18px;color:#8492a0;font-size:12.5px;text-decoration:none}
+  .forgot{display:block;text-align:left;margin-top:8px;font-size:12px;color:#166534;text-decoration:none}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <img src="logo.jpg" alt="جسر الوصول" class="logo">
+  <h1>جسر الوصول لحل مشكلة الرسوب</h1>
+  <p class="subtitle">حساب المدرسة / المعلم</p>
+
+  <div class="tabs">
+    <button id="tabSignup" class="active" type="button">إنشاء حساب</button>
+    <button id="tabLogin" type="button">تسجيل الدخول</button>
+  </div>
+
+  <form id="signupForm" class="active">
+    <label for="suName">الاسم</label>
+    <input id="suName" type="text" placeholder="اسمك أو اسم المدرسة" autocomplete="name">
+    <label for="suEmail">البريد الإلكتروني</label>
+    <input id="suEmail" type="email" placeholder="example@email.com" autocomplete="email">
+    <label for="suPassword">كلمة المرور</label>
+    <input id="suPassword" type="password" placeholder="8 أحرف على الأقل" autocomplete="new-password">
+    <button id="signupBtn" class="submit" type="button">إنشاء الحساب</button>
+  </form>
+
+  <form id="loginForm">
+    <label for="liEmail">البريد الإلكتروني</label>
+    <input id="liEmail" type="email" placeholder="example@email.com" autocomplete="email">
+    <label for="liPassword">كلمة المرور</label>
+    <input id="liPassword" type="password" placeholder="كلمة المرور" autocomplete="current-password">
+    <button id="loginBtn" class="submit" type="button">تسجيل الدخول</button>
+    <a href="#" class="forgot" id="forgotLink">نسيت كلمة المرور؟</a>
+  </form>
+
+  <div class="divider">أو</div>
+  <button id="googleBtn" class="google-btn" type="button">
+    <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84c-.21 1.13-.84 2.09-1.8 2.73v2.27h2.91c1.7-1.57 2.69-3.88 2.69-6.64z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.91-2.27c-.81.54-1.84.86-3.05.86-2.34 0-4.33-1.58-5.04-3.71H.96v2.34C2.44 15.98 5.48 18 9 18z"/><path fill="#FBBC05" d="M3.96 10.7c-.18-.54-.28-1.11-.28-1.7s.1-1.16.28-1.7V4.96H.96A8.996 8.996 0 000 9c0 1.45.35 2.83.96 4.04l3-2.34z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.51.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.96l3 2.34C4.67 5.16 6.66 3.58 9 3.58z"/></svg>
+    الدخول باستخدام Google
+  </button>
+
+  <div id="message" class="msg"></div>
+  <a href="index.html" class="back">→ العودة للموقع الرئيسي</a>
+</div>
+
+<script type="module">
+import { signUp, signIn, signInWithGoogle, getSession, resetPassword } from './auth.js';
+import { createSchool, getCurrentSchool } from './school.js';
+
+const tabSignup = document.querySelector('#tabSignup');
+const tabLogin = document.querySelector('#tabLogin');
+const signupForm = document.querySelector('#signupForm');
+const loginForm = document.querySelector('#loginForm');
+
+function showMsg(text, type) {
+  const el = document.querySelector('#message');
+  el.textContent = text;
+  el.className = 'msg ' + type;
+}
+
+tabSignup.onclick = () => {
+  tabSignup.classList.add('active'); tabLogin.classList.remove('active');
+  signupForm.classList.add('active'); loginForm.classList.remove('active');
+};
+tabLogin.onclick = () => {
+  tabLogin.classList.add('active'); tabSignup.classList.remove('active');
+  loginForm.classList.add('active'); signupForm.classList.remove('active');
+};
+
+document.querySelector('#signupBtn').onclick = async () => {
+  try {
+    const name = document.querySelector('#suName').value.trim();
+    const email = document.querySelector('#suEmail').value.trim();
+    const password = document.querySelector('#suPassword').value;
+
+    if (!name) throw new Error('الرجاء إدخال الاسم.');
+    if (!email) throw new Error('الرجاء إدخال البريد الإلكتروني.');
+    if (password.length < 8) throw new Error('كلمة المرور 8 أحرف على الأقل.');
+
+    const result = await signUp(email, password);
+
+    if (result.session) {
+      // Email confirmation is off in this project — proceed straight to school creation.
+      await createSchool({ name, email });
+      showMsg('تم إنشاء الحساب بنجاح. جارٍ التحويل...', 'success');
+      window.location.href = 'dashboard.html';
+    } else {
+      showMsg('تم إنشاء الحساب. تحقق من بريدك الإلكتروني لتأكيد الحساب، ثم سجّل الدخول.', 'success');
+    }
+  } catch (err) {
+    showMsg(err.message, 'error');
+  }
+};
+
+document.querySelector('#loginBtn').onclick = async () => {
+  try {
+    const email = document.querySelector('#liEmail').value.trim();
+    const password = document.querySelector('#liPassword').value;
+
+    if (!email || !password) throw new Error('الرجاء إدخال البريد الإلكتروني وكلمة المرور.');
+
+    await signIn(email, password);
+    const school = await getCurrentSchool();
+    window.location.href = school ? 'dashboard.html' : 'setup.html';
+  } catch (err) {
+    showMsg(err.message, 'error');
+  }
+};
+
+document.querySelector('#googleBtn').onclick = async () => {
+  try {
+    await signInWithGoogle();
+  } catch (err) {
+    showMsg(err.message, 'error');
+  }
+};
+
+document.querySelector('#forgotLink').onclick = async (e) => {
+  e.preventDefault();
+  const email = document.querySelector('#liEmail').value.trim();
+  if (!email) { showMsg('اكتب بريدك الإلكتروني أولاً في الحقل أعلاه.', 'error'); return; }
+  try {
+    await resetPassword(email);
+    showMsg('تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك.', 'success');
+  } catch (err) {
+    showMsg(err.message, 'error');
+  }
+};
+
+// If already logged in, skip straight ahead.
+(async () => {
+  try {
+    const session = await getSession();
+    if (session) {
+      const school = await getCurrentSchool();
+      window.location.href = school ? 'dashboard.html' : 'setup.html';
+    }
+  } catch (e) { /* not logged in — stay on this page */ }
+})();
+</script>
+
+</body>
+</html>

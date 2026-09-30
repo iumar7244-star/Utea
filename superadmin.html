@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة إدارة المنصة — جسر الوصول</title>
+<link rel="icon" href="logo.jpg" type="image/jpeg">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Inter:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Tajawal',Arial,sans-serif;background:#f4f7f6;color:#0b2338}
+  .topbar{background:#082b4c;color:#fff;padding:16px 22px;display:flex;align-items:center;justify-content:space-between}
+  .topbar b{font-size:17px}
+  .topbar a{color:#f5c451;text-decoration:none;font-weight:700;font-size:13px}
+  .wrap{max-width:1080px;margin:26px auto;padding:0 16px}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+  .stat{background:#fff;border:1px solid #e3e9ec;border-radius:16px;padding:18px;text-align:center}
+  .stat strong{display:block;font-size:26px;color:#082b4c;font-family:Inter,sans-serif}
+  .stat span{font-size:12px;color:#6b7b85}
+  .card{background:#fff;border:1px solid #e3e9ec;border-radius:16px;padding:22px;margin-bottom:20px;box-shadow:0 8px 24px rgba(8,43,76,.05)}
+  h2{margin:0 0 14px;font-size:18px;color:#082b4c}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:start;padding:9px 6px;border-bottom:1px solid #eef1f3}
+  th{color:#6b7b85;font-weight:700}
+  .muted{color:#8492a0;font-size:12.5px}
+  input[type=search]{width:100%;padding:9px 12px;border:1px solid #d7dee2;border-radius:9px;font-size:13px;margin-bottom:12px;font-family:inherit}
+  .btn-danger{background:#fdeceb;color:#a1302a;border:0;border-radius:8px;padding:6px 12px;font-weight:800;font-size:12px;cursor:pointer}
+  .btn-manage{background:#082b4c;color:#fff;border:0;border-radius:8px;padding:6px 12px;font-weight:800;font-size:12px;cursor:pointer;text-decoration:none;display:inline-block}
+  .gate{max-width:420px;margin:80px auto;text-align:center;background:#fff;padding:30px;border-radius:16px;border:1px solid #e3e9ec}
+</style>
+</head>
+<body>
+
+<div id="gate" class="gate" style="display:none">
+  <p>هذا الحساب لا يملك صلاحية مشرف المنصة.</p>
+  <a href="index.html" style="color:#166534;font-weight:800">→ الموقع الرئيسي</a>
+</div>
+
+<div id="app" style="display:none">
+  <div class="topbar">
+    <b>لوحة إدارة المنصة</b>
+    <div>
+      <a href="index.html">الموقع الرئيسي</a>
+      &nbsp;·&nbsp;
+      <a href="#" id="logoutLink">تسجيل الخروج</a>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat"><strong id="statSchools">0</strong><span>مدرسة مسجّلة</span></div>
+      <div class="stat"><strong id="statUsers">0</strong><span>مستخدم مسجّل</span></div>
+      <div class="stat"><strong id="statAdmins">0</strong><span>مدير/مالك مدرسة</span></div>
+    </div>
+
+    <div class="card">
+      <h2>كل المدارس</h2>
+      <input type="search" id="schoolSearch" placeholder="ابحث باسم المدرسة أو بريد المالك...">
+      <table>
+        <thead><tr><th>المدرسة</th><th>البريد الإلكتروني للمالك</th><th>عدد الأعضاء</th><th>تاريخ الإنشاء</th><th></th></tr></thead>
+        <tbody id="schoolsBody"></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>كل المستخدمين المسجّلين</h2>
+      <input type="search" id="userSearch" placeholder="ابحث بالبريد الإلكتروني...">
+      <table>
+        <thead><tr><th>البريد الإلكتروني</th><th>المدرسة</th><th>الدور</th><th>تاريخ التسجيل</th></tr></thead>
+        <tbody id="usersBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { requireAuth, signOut } from './auth.js';
+import { isPlatformAdmin, listAllSchools, listAllUsers, deleteSchool } from './superadmin.js';
+
+let SCHOOLS = [];
+let USERS = [];
+
+function fmtDate(d) { return d ? new Date(d).toLocaleDateString('ar-EG') : '—'; }
+
+function renderSchools(list) {
+  document.querySelector('#schoolsBody').innerHTML = list.map(s => `
+    <tr>
+      <td><b>${s.name}</b></td>
+      <td>${s.owner_email || '—'}</td>
+      <td>${s.member_count}</td>
+      <td>${fmtDate(s.created_at)}</td>
+      <td style="display:flex;gap:6px">
+        <a class="btn-manage" href="dashboard.html?school=${s.id}">إدارة المحتوى</a>
+        <button class="btn-danger" data-del="${s.id}">حذف</button>
+      </td>
+    </tr>
+  `).join('') || '<tr><td colspan="5" class="muted">لا توجد مدارس بعد.</td></tr>';
+
+  document.querySelectorAll('[data-del]').forEach(btn => {
+    btn.onclick = async () => {
+      if (!confirm(`حذف مدرسة "${btn.closest('tr').querySelector('b').textContent}" نهائيًا وكل بياناتها؟`)) return;
+      await deleteSchool(btn.dataset.del);
+      await loadSchools();
+    };
+  });
+}
+
+function renderUsers(list) {
+  document.querySelector('#usersBody').innerHTML = list.map(u => `
+    <tr>
+      <td>${u.email}</td>
+      <td>${u.school_name || '—'}</td>
+      <td>${u.role || '—'}</td>
+      <td>${fmtDate(u.created_at)}</td>
+    </tr>
+  `).join('') || '<tr><td colspan="4" class="muted">لا يوجد مستخدمون بعد.</td></tr>';
+}
+
+async function loadSchools() {
+  SCHOOLS = await listAllSchools();
+  document.querySelector('#statSchools').textContent = SCHOOLS.length;
+  renderSchools(SCHOOLS);
+}
+
+async function loadUsers() {
+  USERS = await listAllUsers();
+  document.querySelector('#statUsers').textContent = USERS.length;
+  renderUsers(USERS);
+}
+
+document.querySelector('#schoolSearch').oninput = (e) => {
+  const q = e.target.value.trim().toLowerCase();
+  renderSchools(SCHOOLS.filter(s => (s.name || '').toLowerCase().includes(q) || (s.owner_email || '').toLowerCase().includes(q)));
+};
+document.querySelector('#userSearch').oninput = (e) => {
+  const q = e.target.value.trim().toLowerCase();
+  renderUsers(USERS.filter(u => (u.email || '').toLowerCase().includes(q)));
+};
+
+document.querySelector('#logoutLink').onclick = async (e) => {
+  e.preventDefault();
+  await signOut();
+  window.location.href = 'login.html';
+};
+
+(async function init() {
+  try {
+    await requireAuth();
+    const ok = await isPlatformAdmin();
+    if (!ok) { document.querySelector('#gate').style.display = 'block'; return; }
+
+    document.querySelector('#app').style.display = 'block';
+    await loadSchools();
+    await loadUsers();
+    document.querySelector('#statAdmins').textContent =
+      USERS.filter(u => u.role === 'owner' || u.role === 'admin').length || '—';
+  } catch (err) {
+    window.location.href = 'login.html';
+  }
+})();
+</script>
+
+</body>
+</html>
